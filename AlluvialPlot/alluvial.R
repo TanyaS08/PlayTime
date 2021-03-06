@@ -4,8 +4,8 @@ library(tidylog)
 library(tidyverse)
 library(lubridate)
 library(ggforce) # for alluvial plots
-library(extrafont)
-library(showtext) #for importing cistom text
+library(extrafont) #for importing non-system fonts
+library(showtext) #for importing non-system fonts
 library(here)
 
 ## Read in Font ----
