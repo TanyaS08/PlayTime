@@ -59,10 +59,10 @@ ggplot(data = SW,
            value = value)) +
   geom_parallel_sets(aes(fill = films),
                      alpha = 0.6,
-                     axis.width = 0.17,#'gap'  of axis
+                     axis.width = 0.2,#'gap'  of axis
                      sep = 0.04,
                      size = 0) +
-  geom_parallel_sets_axes(axis.width = 0.17, #'gap'  of axis
+  geom_parallel_sets_axes(axis.width = 0.2, #'gap'  of axis
                           sep = 0.04,
                           fill = "#050304"
   )  +
@@ -122,7 +122,8 @@ ggplot(data = SW,
         legend.position = "none",
         plot.caption = element_text(size = 9,
                                     colour = "#FBFBFB",
-                                    family = "Offside"),
+                                    family = "Offside",
+                                    hjust = 0.5),
         plot.margin = unit(c(0,-4,0,-4), "cm"))  +
   annotate(
     geom = "text",
@@ -147,5 +148,5 @@ ggplot(data = SW,
 
 ggsave(here::here("alluvial.png"),
        height = 8.5, width = 15,
-       units = "in", dpi = 600)
+       units = "in", dpi = 300)
 
