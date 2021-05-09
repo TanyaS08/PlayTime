@@ -2,6 +2,8 @@ devtools::install_github("djnavarro/flametree")
 library(flametree)
 library(tidyverse)
 
+set.seed(3)
+
 layout <- "
 ABDE
 ACCE
@@ -30,14 +32,21 @@ p2 = flametree_grow(time = 12,
 #plank
 p3 = flametree_grow(trees = 15,
                     scale = c(5.71, 1.47, 1.51, 0.655),
-                    angle = c(211, 277, -203, -22),
-                    shift_x = spark_random(multiplier = 1),
-                    shift_y = spark_random(multiplier = 1)) %>% 
+                    angle = c(211, 277, -203, -22)) %>% 
   flametree_plot(palette = c(
     "#d4f294", 
-    "#f235b0", 
+    "#f235b0" 
   ), 
-  style = "wisp")
+  style = "nativeflora")
+
+p3w = flametree_grow(trees = 15,
+                    scale = c(5.71, 1.47, 1.51, 0.655),
+                    angle = c(211, 277, -203, -22)) %>% 
+  flametree_plot(palette = c(
+    "#d4f294", 
+    "#f235b0" 
+  ), 
+   style = "whisp")
 
 #az
 p4 = flametree_grow(time = 15,
@@ -71,8 +80,10 @@ beepr::beep(sound = 8)
 ggsave("flametree1.png", p1, width = 7, height = 10, units = "in")
 ggsave("flametree2.png", p2, width = 30, height = 10, units = "in")
 ggsave("flametree3.png", p3, width = 30, height = 10, units = "in")
+ggsave("flametree3wisp.png", p3w, width = 30, height = 10, units = "in")
 ggsave("flametree4.png", p4, width = 30, height = 10, units = "in")
 ggsave("flametree5.png", p5, width = 30, height = 10, units = "in")
+ggsave("flametree_all.png", p, width = 30, height = 10, units = "in")
 
 
 
