@@ -165,15 +165,15 @@ rk <- rk %>%
 col_pal =
   tibble::tibble(
     genre = 
-    c("80s", "Alternative", "Americana", "Hard Rock", "Heavy Metal", "Hip-Hop", "Metal", "Pop", "R&B", 
-      "Rock", "Soul", "Dance", "Funk"),
+      c("80s", "Alternative", "Americana", "Hard Rock", "Heavy Metal", "Hip-Hop", "Metal", "Pop", "R&B", 
+        "Rock", "Soul", "Dance", "Funk"),
     colour = palettetown::pokepal(206, spread = 13)
   )
 
 p <- rk %>%
-mutate(season_txt = ifelse(season_txt == "Summer\n2021",
-                           "Winter\n2021",
-                           season_txt)) %>%
+  mutate(season_txt = ifelse(season_txt == "Summer\n2021",
+                             "Winter\n2021",
+                             season_txt)) %>%
   ggplot(aes(order, rank, color = tags, group = tags)) +
   geom_bump(smooth = 15, size = 2, alpha = 0.2) +
   scale_y_reverse()  +
@@ -398,3 +398,36 @@ p2 <- rk %>%
             color = "white")
 
 p2
+
+ggsave("Spotify_w_Prince.png",
+       p)
+
+ggsave("Spotify_no_Prince.png",
+       p2)
+
+
+top_arts = df %>%
+  mutate(month = case_when(
+    month(month) %in% c(7:8)  ~ "Stuck in UK",
+    month(month) %in% c(9:10) ~ "SVD ms",
+    month(month) %in% c(11:12) ~ "Roadmap ms",
+    month(month) %in% c(2) ~ "Roadmap ms",
+    month(month) %in% c(1) ~ "2nd Wave",
+    month(month) %in% c(3) ~ "Traitstrap ms",
+    month(month) %in% c(4:5) ~ "Transfer learning",
+    month(month) %in% c(6) ~ "3rd Wave")) %>%
+  group_by(artistName, month) %>% 
+  summarise(listens = n()) %>% 
+  ungroup() %>% 
+  arrange(-listens) %>%
+  group_by(month) %>%
+  mutate(rank = rank(-listens, ties.method = "random")) %>%
+  ungroup() %>%
+  group_by(artistName) %>%
+  mutate(any_top_5 = any(rank <= 5)) %>% 
+  ungroup() %>%
+  mutate(rank = if_else(rank > 5,
+                        6L,
+                        rank)) %>% 
+  filter(any_top_5 == TRUE) %>%
+  View()
