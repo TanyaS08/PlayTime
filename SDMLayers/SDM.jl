@@ -7,63 +7,28 @@ using Statistics
 using GeometryBasics
 
 observations = occurrences(
-    GBIF.taxon("Hypomyces lactifluorum"; strict=true),
-    "hasCoordinate" => "true",
-    "country" => "CA",
-    "country" => "US",
+    taxon("Vombatus ursinus"; rank=:SPECIES),
+    "hasCoordinate" => true,
+    "decimalLatitude" => "-45,-20",
+    "decimalLongitude" => "130,160",
     "limit" => 300,
 )
 
-while length(observations) < size(observations)
+while length(observations) <= min(10_000, size(observations))
     occurrences!(observations)
 end
 
-left, right = extrema(longitudes(observations)) .+ (-5, 5)
-bottom, top = extrema(latitudes(observations)) .+ (-5, 5)
-boundaries = (left=left, right=right, bottom=bottom, top=top)
+aus_boundingbox = (left=130.0, right=160.0, bottom=-45.0, top=-20.0)
+layers_to_keep = [2, 3, 6, 9, 15, 18, 19]
 
 predictors =
     convert.(
-        Float32, SimpleSDMPredictor(WorldClim, BioClim, 1:19; resolution=10.0, boundaries...)
+        SimpleSDMLayer, SimpleSDMPredictor(WorldClim, BioClim, layers_to_keep; resolution=10.0, aus_boundingbox...)
     );
-
-push!(
-    predictors,
-    convert(
-        Float32, SimpleSDMPredictor(WorldClim, Elevation; resolution=10.0, boundaries...)
-    ),
-);
-
-plot(plot.(predictors, grid=:none, axes=false, frame=:none, leg=false, c=:imola)...)
-
-# here
-
-function vif(model)
-    R² = r2(model)
-    return 1 / (1-R²)
-end
-
-function stepwisevif(
-    layers::Vector{T}, selection=collect(1:length(layers)), threshold::Float64=5.0
-) where {T<:SimpleSDMLayer}
-    x = hcat([layer[keys(layer)] for layer in layers[selection]]...)
-    X = (x .- mean(x; dims=1)) ./ std(x; dims=1)
-    vifs = zeros(Float64, length(selection))
-    for i in eachindex(selection)
-        vifs[i] = vif(lm(X[:, setdiff(eachindex(selection), i)], X[:, i]))
-    end
-    all(vifs .<= threshold) && return selection
-    drop = last(findmax(vifs))
-    popat!(selection, drop)
-    @info "Variables remaining: $(selection)"
-    return stepwisevif(layers, selection, threshold)
-end
-
-layers_to_keep = stepwisevif(predictors)
 
 plot(
     plot.(
-        predictors[layers_to_keep], grid=:none, axes=false, frame=:none, leg=false, c=:imola
+        predictors, grid=:none, axes=false, frame=:none, leg=false, c=:imola
     )...,
 )
 
